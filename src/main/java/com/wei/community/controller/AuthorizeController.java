@@ -4,6 +4,7 @@ import com.wei.community.Provider.GithubProvider;
 import com.wei.community.dto.AccessTokenDTO;
 import com.wei.community.dto.GithubUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,15 +14,24 @@ public class AuthorizeController {
     @Autowired
     private GithubProvider githubProvider;
 
+    @Value("${github.client.id}")
+    private String clientId;
+    @Value("${github.client.secret}")
+    private String clientSecret;
+    @Value("${github.redirect.url}")
+    private String redirectUrl;
+    /**
+     * 当成功获取登陆信息后，返回调用这个方法
+     */
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state")String state){
 
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
-        accessTokenDTO.setClient_id("9c102c0040de62f3e14c");
-        accessTokenDTO.setClient_secret("796b0b080480715c75ba4c764cbe16bf2a4caf1d");
+        accessTokenDTO.setClient_id(clientId);
+        accessTokenDTO.setClient_secret(clientSecret);
         accessTokenDTO.setCode(code);
-        accessTokenDTO.setRedirect_url("http://localhost:8080/callback");
+        accessTokenDTO.setRedirect_url(redirectUrl);
         accessTokenDTO.setState(state);
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
         GithubUser user = githubProvider.getUser(accessToken);
