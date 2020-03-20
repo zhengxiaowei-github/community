@@ -11,7 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 @Controller
@@ -37,7 +38,7 @@ public class AuthorizeController {
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state")String state,
-                            HttpServletRequest request){
+                            HttpServletResponse response){
 
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setClient_id("9c102c0040de62f3e14c");
@@ -59,14 +60,14 @@ public class AuthorizeController {
         if (githubUser != null){
             //登陆成功
             User user = new User();
-            user.setToken(UUID.randomUUID().toString());
+            String token = UUID.randomUUID().toString();
+            user.setToken(token);  //ctrl+alt+V抽取变量
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
             userMapper.insert(user);
-            request.getSession().setAttribute("user",user);
-            System.out.println("登陆成功");
+            response.addCookie(new Cookie("token",token));
             return "redirect:/";
         }else {
             //登陆失败
