@@ -25,7 +25,7 @@ public class IndexController {
      * 3.git commit -m "描述信息"
      * 4.git push 上传
      */
-    @RequestMapping("/index")
+    @RequestMapping("/")
     public String hello(){
         return "index";
     }
